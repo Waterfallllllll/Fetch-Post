@@ -1,5 +1,3 @@
-// В случае, если работаем с json сервером.
-
 window.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector("form");
     
@@ -8,18 +6,18 @@ window.addEventListener("DOMContentLoaded", () => {
         e.preventDefault(); // Чтобы форма не перезагружала страницу при нажатии кнопки.
 
         let formData = new FormData(form);
-        formData.append("id", Math.random()); // просто чтобы показать, что мы можем аппендить в объект formdata пару ключ значение.
-        // Дальше мы не можем просто сделать  let json = JSON.stringify(formData). Это работать не будет. Если мы хоти отправить объект formdata в json файл, нужно сделать то что ниже. Просто перезаписать все в обычный js объект, а затем js объект переделать в json формат.
+        // formData.append("id", Math.random()); // просто чтобы показать, что мы можем аппендить в объект formdata пару ключ значение.
+        // // Дальше мы не можем просто сделать  let json = JSON.stringify(formData). Это работать не будет. Если мы хоти отправить объект formdata в json файл, нужно сделать то что ниже. Просто перезаписать все в обычный js объект, а затем js объект переделать в json формат.
 
-        let obj = {};
+        // let obj = {};
         
-        formData.forEach((value, key) => {
-            obj[key] = value;
-        });
+        // formData.forEach((value, key) => {
+        //     obj[key] = value;
+        // });
 
 
-        getResources("http://localhost:3000/people", obj)
-            .then(data => createCards(data))
+        getResources("./api.php", formData)
+            .then(data => console.log(data))
             .catch(err => console.error(err));
         
     }
@@ -29,17 +27,17 @@ window.addEventListener("DOMContentLoaded", () => {
     async function getResources(url, data) {
         const res = await fetch(`${url}`, {
             method: "POST", // по умолчанию get
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify(data)
+            // headers: {
+            //     "Content-type": "multipart/form-data" // Также как и в случае XMLhttpRequest
+            // },
+            body: data
         });
 
         if (!res.ok) { // Своство ok говорит - у нас все прошло успешно и запрос выполнился
             throw new Error(`Could not fetch ${url}, status: ${res.status}`); // Своство status такоже как и в XMLHttpRequest
         }
 
-        return await res.json(); // Нам нужно дождаться превращения json в обычный объект. Поэтому ставим await. 
+        return await res.text(); // Просто выводим text. Нам не нужно что-то переделывать из json формата.
     }
 
     function createCards(data) {
